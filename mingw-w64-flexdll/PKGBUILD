@@ -4,48 +4,42 @@
 _realname=flexdll
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
-pkgver=0.34
-pkgrel=2
+pkgver=0.35
+pkgrel=1
 pkgdesc="An implementation of a dlopen-like API for Windows (mingw-w64)"
 arch=('any')
 url='http://alain.frisch.fr/flexdll.html'
 license=('zlib/libpng License')
 makedepends=("${MINGW_PACKAGE_PREFIX}-ocaml")
 source=("http://alain.frisch.fr/flexdll/${_realname}-${pkgver}.tar.gz"
-        "0001-Fix-the-List.hd-exception.patch"
-        "0002-Add-path-to-libcrt2.o-into-the-default-library-searc.patch"
-        "0003-Remove-the-usages-of-stdout-to-workaround-the-missin.patch"
-        "0004-use-lib-flexdll-as-the-default-library-path.patch")
-sha256sums=('db5e2e97c17ddc9dbb12835b9265e59eeab892fd62d15dcc13f176730b875117'
-            '58df96e5459605342fc6e60a442e23de3841a50743cb2e5a36d3be78d7015fe1'
-            '74aaa64d7c7309393092f64fbd7daf6d6f07f300c98ad1194a028d8d89ae96f7'
-            '3d9470049d1e8070861cf344b6e31caca89c98ab9801483b48d69e81a45c1d1e'
+        "0001-Fix-windres-path.patch"
+        "0002-use-lib-flexdll-as-the-default-library-path.patch")
+sha256sums=('125f1fa966228296c5b08ed04af3e6c10bbdc9829d5c4d094e3ad17adf898797'
+            'b9b330f4519c53f1c6e7e3cbbd555696e4349ee6cc99be1c43d4a40a3f5b2ff6'
             'c5e6d9891557866d1dfaed3a693dfaa294babfbecec1970ac2f51ae9eabc10d8')
 
-if [ "${CARCH}" == "i686" ]; then
+if [ "${MSYSTEM_CARCH}" == "i686" ]; then
   chain="mingw"
 else
   chain="mingw64"
 fi
 
 prepare() {
-  cd ${srcdir}/${_realname}
+  cd ${srcdir}/${_realname}-${pkgver}
 
-  patch -p1 -i ${srcdir}/0001-Fix-the-List.hd-exception.patch
-  patch -p1 -i ${srcdir}/0002-Add-path-to-libcrt2.o-into-the-default-library-searc.patch
-  patch -p1 -i ${srcdir}/0003-Remove-the-usages-of-stdout-to-workaround-the-missin.patch
-  patch -p1 -i ${srcdir}/0004-use-lib-flexdll-as-the-default-library-path.patch
+  patch -p1 -i ${srcdir}/0001-Fix-windres-path.patch
+  patch -p1 -i ${srcdir}/0002-use-lib-flexdll-as-the-default-library-path.patch
 }
 
 build() {
   [[ -d ${srcdir}/build-${MINGW_CHOST} ]] && rm -rf ${srcdir}/build-${MINGW_CHOST}
-  cp -rf ${_realname} build-${MINGW_CHOST}
+  cp -rf ${_realname}-${pkgver} build-${MINGW_CHOST}
   cd ${srcdir}/build-${MINGW_CHOST}
 
   unset FLEXDIR
   unset OCAMLLIB
-  make flexlink.exe -j1
-  make build_${chain} -j1
+  make flexlink.exe -j1 TOOLCHAIN=${chain}
+  make build_${chain} -j1 TOOLCHAIN=${chain}
 }
 
 check() {

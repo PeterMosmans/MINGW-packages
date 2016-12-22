@@ -1,0 +1,11 @@
+--- flexdll-0.35-orig/Makefile	2016-12-22 02:40:41.626552000 +0000
++++ b/Makefile	2016-12-22 02:48:04.269265400 +0000
+@@ -138,7 +138,7 @@
+ 	$(RES_PREFIX) rc version.rc
+ 
+ version_res.o: version.rc
+-	$(TOOLPREF)windres version.rc version_res.o
++	windres version.rc version_res.o
+ 
+ flexdll_msvc.obj: flexdll.h flexdll.c
+ 	$(MSVC_PREFIX) $(MSVCC) /DMSVC -c /Fo"flexdll_msvc.obj" flexdll.c
